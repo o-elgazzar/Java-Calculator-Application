@@ -23,6 +23,12 @@ public class Calculator {
         //ContentPane is the big box containing all the smaller boxes in it which are the panels
 
         //Buttons
+        
+        //Instead of manually having to create a button for every single number and operator 
+        //we will put it into a 2D array and then use nested for loops
+        // to create  button functions for each one in the array
+        //this is a better and faster approach
+        
         String[][] buttonLabels = {
                 {"7", "8", "9", "+"},
                 {"4", "5", "6", "-"},
@@ -44,6 +50,7 @@ public class Calculator {
                 panel.add(button);
             }
         }
+
         frame.getContentPane().add(panel);
 
         frame.pack();
