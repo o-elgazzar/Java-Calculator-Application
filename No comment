@@ -1,0 +1,77 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.script.*;
+
+public class Calculator {
+    public static void main(String[] args) {
+
+        JFrame frame = new JFrame("Calculator");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(300,400);
+        frame.setLayout(new BorderLayout());
+
+        JTextField display = new JTextField(20);
+        display.setEditable(false);
+        display.setHorizontalAlignment(SwingConstants.RIGHT);
+        frame.getContentPane().add(display, BorderLayout.NORTH);
+
+        JPanel panel = new JPanel(); // Creates a new panel section
+        panel.setLayout(new GridLayout(4,4));
+
+        String[][] buttonLabels = {
+                {"7", "8", "9", "+"},
+                {"4", "5", "6", "-"},
+                {"1", "2", "3", "*"},
+                {"0", "C", "=", "/"}
+        };
+        final boolean[] shouldClear = {true};
+
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        ScriptEngine engine = mgr.getEngineByName("JavaScript");
+
+        for(int i = 0; i < buttonLabels.length; i++) {
+            for(int j = 0; j < buttonLabels[i].length;j++) {
+                String label = buttonLabels[i][j];
+                JButton button = new JButton(label);
+                button.setActionCommand(label);
+                button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String command = e.getActionCommand();
+                        if("0123456789".contains(command)) {
+                            if(shouldClear[0]) {
+                                display.setText(command);
+                                shouldClear[0] = false;
+                            } else {
+                                display.setText(display.getText() + command);
+                            }
+                        } else if(command.equals("C")) {
+                            display.setText("");
+                            shouldClear[0] = true;
+                        } else if(command.equals("=")) {
+                            try {
+                                display.setText(String.valueOf(engine.eval(display.getText())));
+                                shouldClear[0] = true;
+                            } catch(ScriptException se) {
+                                display.setText("Error");
+                                shouldClear[0] = true;
+                            }
+                        } else {
+                            display.setText(display.getText() + " " + command + " ");
+                            shouldClear[0] = true;
+                        }
+                    }
+                });
+                panel.add(button);
+            }
+        }
+
+        frame.getContentPane().add(panel, BorderLayout.CENTER);
+        frame.setVisible(true);
+    }
+    private static String evaluateExpression(String expression, ScriptEngine engine) throws ScriptException {
+        // Remove spaces for proper evaluation
+        expression = expression.replace(" ", "");
+        return String.valueOf(engine.eval(expression));
+    }
+}
